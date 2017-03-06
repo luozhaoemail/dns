@@ -197,23 +197,23 @@ public class DmResult implements Writable{
 	//*******
 	//------------------------------
 
-	/*public String toString() {
+	public String toString() {
 		return DmName + ", " + Domain + ", " + Recode + ", " + NetName
 				+ ", " + Company + ", " + ClassifyName + ", "
 				+ ClassifyParentName + ", " + ProvName + ", " + Cdoe + ", "
 				+ CacheConHitCount + ", " + CMCCConHitCount + ", " + DirectConHitCount
 				+ ", " + CTTConHitCount + ", " + UserInfo + ", " + IDCCount
 				+ ", " + CacheCount + ", " + CDNCount;
-	}*/
-	
-	public String toString() {
+	}
+
+	/*public String toString() {
 		return "DmResult [DmName=" + DmName + ", Domain=" + Domain + ", Recode=" + Recode + ", NetName=" + NetName
 				+ ", Company=" + Company + ", ClassifyName=" + ClassifyName + ", ClassifyParentName="
 				+ ClassifyParentName + ", ProvName=" + ProvName + ", Cdoe=" + Cdoe + ", CacheConHitCount="
 				+ CacheConHitCount + ", CMCCConHitCount=" + CMCCConHitCount + ", DirectConHitCount=" + DirectConHitCount
 				+ ", CTTConHitCount=" + CTTConHitCount + ", UserInfo=" + UserInfo + ", IDCCount=" + IDCCount
 				+ ", CacheCount=" + CacheCount + ", CDNCount=" + CDNCount + "]";
-	}
+	}*/
 		
 
 	@Override

@@ -170,58 +170,28 @@ public class RunJob2 {
  		@Override 
 		public void reduce(Text k, Iterable<DmResult> val, Context context)  
 	            	   throws IOException, InterruptedException {
-			/*int i=0;			
-	    	for(DmResult t : val)	   	
-	    	{
-	    		if(t.getCacheConHitCount()!=0)
-	    			i += t.getCacheConHitCount();
-	    		else if(t.getCMCCConHitCount()!=0)
-	    			i += t.getCMCCConHitCount();
-	    		else if(t.getDirectConHitCount()!=0)
-	    			i += t.getDirectConHitCount();
-	    		else if(t.getCTTConHitCount()!=0)
-	    			t.setCTTConHitCount();	    		
-	    		if(t.getCacheCount()!=0)
-	    			i += t.getCacheCount();
-	    		else if(t.getCDNCount()!=0)
-	    			i += t.getCDNCount();
-	    		else if(t.getIDCCount()!=0)
-	    			i += t.getIDCCount();	
-	    	}*/
- 			String key =k.toString();
- 			if(key.contains(";"))
- 				key =key.substring(key.indexOf(";"),key.length()-1);
- 			System.out.println("-----key:"+key);
- 			
- 			for(DmResult t : val)
- 				context.write(NullWritable.get(),t);
- 			
- 			/*int i=0;			
-	    	for(DmResult iter : val)	   	
-	    		i++;
-	    	for(DmResult t : val)	   	
-	    	{
-	    		if(t.getCacheConHitCount()!=0)
-	    			t.setCacheConHitCount(i);
-	    		else if(t.getCMCCConHitCount()!=0)
-	    			t.setCMCCConHitCount(i);
-	    		else if(t.getDirectConHitCount()!=0)
-	    			t.setDirectConHitCount(i);
-	    		else if(t.getCTTConHitCount()!=0)
-	    			t.setCTTConHitCount(i);	    		
-	    		else if(t.getCacheCount()!=0)
-	    			t.setCacheCount(i);
-	    		else if(t.getCDNCount()!=0)
-	    			t.setCDNCount(i);
-	    		else if(t.getIDCCount()!=0)
-	    			t.setIDCCount(i); 
-	    	
-	    		context.write(NullWritable.get(),t);	    		
-	    		break;
-	    	}*/
-	    
-    		
-
+ 			int i=0;		
+ 			DmResult t =new DmResult();		
+ 	    	for(DmResult iter : val)	   	
+ 	    	{
+ 	    		i++;
+ 	    		t= iter;    
+ 	    	} 	    	
+ 	    	if(t.getCacheConHitCount()!=0)
+ 				t.setCacheConHitCount(i);
+ 			else if(t.getCMCCConHitCount()!=0)
+ 				t.setCMCCConHitCount(i);
+ 			else if(t.getDirectConHitCount()!=0)
+ 				t.setDirectConHitCount(i);
+ 			else if(t.getCTTConHitCount()!=0)
+ 				t.setCTTConHitCount(i);	    		
+ 			if(t.getCacheCount()!=0)
+ 				t.setCacheCount(i);
+ 			else if(t.getCDNCount()!=0)
+ 				t.setCDNCount(i);
+ 			else if(t.getIDCCount()!=0)
+ 				t.setIDCCount(i); 
+ 	    	context.write(NullWritable.get(),t);
 	    } 	    
 	}
 		
@@ -267,12 +237,12 @@ public class RunJob2 {
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(DmResult.class);	
 		job.setOutputKeyClass(NullWritable.class);  
-        job.setOutputValueClass(DmResult.class);	
-		
-        job.setCombinerClass(NewCombiner.class);
+        job.setOutputValueClass(DmResult.class);		
+        //job.setCombinerClass(NewCombiner.class);
         
 		//String[] arg = new String[]{"input/data2.txt","output/dns"};201611140320
-	   String[] arg = new String[]{"file:///root/hive/data2.txt","file:///root/hive/dns"};
+	   //String[] arg = new String[]{"file:///root/hive/data2.txt","file:///root/hive/dns"};
+        String[] arg = new String[]{"file:\\C:\\opt\\data2.txt","file:\\C:\\opt\\dns1"};
         
         //自动删除output
   		Path path = new Path(arg[1]);

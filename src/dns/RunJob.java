@@ -102,7 +102,7 @@ public class RunJob {
 		//相对路径
         //String[] arg = new String[]{"input/201611140320.txt","output/dns"};
 	    //String[] arg = new String[]{"file:///root/hive/201611140320.txt","file:///root/hive/dns"};
-        String[] arg = new String[]{"file:\\C:\\opt\\201611140320.txt","file:\\C:\\opt\\dns"};
+        String[] arg = new String[]{"file:\\C:\\opt\\data.txt","file:\\C:\\opt\\dns1"};
         //自动删除output
   		Path path = new Path(arg[1]);
   		FileSystem fs = path.getFileSystem(conf);
