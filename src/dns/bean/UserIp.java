@@ -1,12 +1,12 @@
 package dns.bean;
 
 public class UserIp {	
-	private long StartIP;
-	private long EndIP;
-	private int ProvCode;
-	private int ComInfo;
-	private String ProvName;
-	private String Code;
+	private long StartIP=0L;
+	private long EndIP=0L;
+	private int ProvCode=0;
+	private int ComInfo=0;
+	private String ProvName="";
+	private String Code="";
 	
 	
 	public UserIp() {

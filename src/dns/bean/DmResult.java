@@ -7,16 +7,16 @@ import java.io.IOException;
 import org.apache.hadoop.io.Writable;
 
 public class DmResult implements Writable{
-	private String DmName;
-	private String Domain;
-	private String Recode;
-	private String NetName;
-	private String Company;
-	private String ClassifyName;
-	private String ClassifyParentName;
+	private String DmName="";
+	private String Domain="";
+	private String Recode="";
+	private String NetName="";
+	private String Company="";
+	private String ClassifyName="";
+	private String ClassifyParentName="";
 	
-	private String ProvName;
-	private String Cdoe;
+	private String ProvName="";
+	private String Cdoe="";
 	private  int CacheConHitCount=0;
 	private  int CMCCConHitCount=0;
 	private  int DirectConHitCount=0;
@@ -26,13 +26,19 @@ public class DmResult implements Writable{
 	private int IDCCount=0;
 	private int CacheCount=0;
 	private int CDNCount=0;
-	
+	////////////
+	private int CuccCount=0;//连通命中次数
+	private int CTCount=0;//电信命中次数
+	private int GATCount=0;//港澳台命中次数
+	private int ForeignCount=0;//国外命中次数
+	private int LocalOperatorCount=0;//本地移动次数
+	private int OtherOperatorCount=0;//外地移动次数
 	
 	public DmResult() {
 		
 	}
 
-	public DmResult(String dmName, String domain, String recode, String netName, String company, String classifyName,
+	/*public DmResult(String dmName, String domain, String recode, String netName, String company, String classifyName,
 			String classifyParentName) {
 		DmName = dmName;
 		Domain = domain;
@@ -41,8 +47,7 @@ public class DmResult implements Writable{
 		Company = company;
 		ClassifyName = classifyName;
 		ClassifyParentName = classifyParentName;
-	}
-	
+	}*/
 	
 	
 	public String getDmName() {
@@ -194,7 +199,44 @@ public class DmResult implements Writable{
 	public void setCDNCount(int cDNCount) {
 		CDNCount = cDNCount;
 	}
-	//*******
+	//******************************
+	public int getCuccCount() {
+		return CuccCount;
+	}
+	public void setCuccCount(int cuccCount) {
+		CuccCount = cuccCount;
+	}
+	public int getCTCount() {
+		return CTCount;
+	}
+	public void setCTCount(int cTCount) {
+		CTCount = cTCount;
+	}
+	public int getGATCount() {
+		return GATCount;
+	}
+	public void setGATCount(int gATCount) {
+		GATCount = gATCount;
+	}
+	public int getForeignCount() {
+		return ForeignCount;
+	}
+	public void setForeignCount(int foreignCount) {
+		ForeignCount = foreignCount;
+	}
+	public int getLocalOperatorCount() {
+		return LocalOperatorCount;
+	}
+	public void setLocalOperatorCount(int localOperatorCount) {
+		LocalOperatorCount = localOperatorCount;
+	}
+	public int getOtherOperatorCount() {
+		return OtherOperatorCount;
+	}
+	public void setOtherOperatorCount(int otherOperatorCount) {
+		OtherOperatorCount = otherOperatorCount;
+	}
+	//******************************
 	//------------------------------
 
 	public String toString() {
@@ -203,7 +245,7 @@ public class DmResult implements Writable{
 				+ ClassifyParentName + ", " + ProvName + ", " + Cdoe + ", "
 				+ CacheConHitCount + ", " + CMCCConHitCount + ", " + DirectConHitCount
 				+ ", " + CTTConHitCount + ", " + UserInfo + ", " + IDCCount
-				+ ", " + CacheCount + ", " + CDNCount;
+				+ ", " + CacheCount + ", " + CDNCount+"\r\n";
 	}
 
 	/*public String toString() {
@@ -215,6 +257,7 @@ public class DmResult implements Writable{
 				+ ", CacheCount=" + CacheCount + ", CDNCount=" + CDNCount + "]";
 	}*/
 		
+	
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
@@ -239,6 +282,12 @@ public class DmResult implements Writable{
 		CacheCount=in.readInt();
 		CDNCount=in.readInt();
 		
+		CuccCount =in.readInt();
+		CTCount =in.readInt();
+		GATCount =in.readInt();
+		ForeignCount =in.readInt();
+		LocalOperatorCount =in.readInt();
+		OtherOperatorCount =in.readInt();
 	}
 
 	@Override
@@ -261,6 +310,13 @@ public class DmResult implements Writable{
 		out.writeInt(IDCCount);
 		out.writeInt(CacheCount);
 		out.writeInt(CDNCount);		
+		
+		out.writeInt(CuccCount);
+		out.writeInt(CTCount);
+		out.writeInt(GATCount);
+		out.writeInt(ForeignCount);
+		out.writeInt(LocalOperatorCount);
+		out.writeInt(OtherOperatorCount);
 	}
 
 }

@@ -2,9 +2,9 @@ package dns.bean;
 
 public class ConnInfo {
 
-	private long StartIP;
-	private long EndIP;	
-	private int ConnectInfo;	
+	private long StartIP=0L;
+	private long EndIP=0L;	
+	private int ConnectInfo=0;	
 	
 	 
 	public ConnInfo() {

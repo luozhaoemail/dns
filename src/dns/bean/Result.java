@@ -25,12 +25,14 @@ public class Result {
 	private String IDCCount ;
 	private String CacheCount ;
 	private String CDNCount ;
+	
 	private String CuccCount ;
 	private String CTCount ;
 	private String GATCount ;
 	private String ForeignCount ;
 	private String LocalOperatorCount ;
 	private String OtherOperatorCount ;
+	
 	private String InNetProportion ;
 	private String OutNetProportion ;
 	private String CacheConHitProportion ;

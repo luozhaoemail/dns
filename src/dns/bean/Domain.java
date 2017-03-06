@@ -1,13 +1,13 @@
 package dns.bean;
 
 public class Domain {	
-	private String DmName;
-	private String Domain;
-	private String Recode;
-	private String NetName;
-	private String Company;
-	private String ClassifyName;
-	private String ClassifyParentName;
+	private String DmName="";
+	private String Domain="";
+	private String Recode="";
+	private String NetName="";
+	private String Company="";
+	private String ClassifyName="";
+	private String ClassifyParentName="";
 	
 	public Domain() {
 		// TODO Auto-generated constructor stub

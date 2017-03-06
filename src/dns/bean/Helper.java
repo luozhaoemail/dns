@@ -1,11 +1,11 @@
 package dns.bean;
 
 public class Helper {	
-	private long StartIP;
-	private long EndIP;	
-	private int HelperStatue; 
-	private String HelperName;
-	private int localId; 
+	private long StartIP=0L;
+	private long EndIP=0L;	
+	private int HelperStatue=0; 
+	private String HelperName="";
+	private int localId=0; 
 	 
 	public Helper() {
 		// TODO Auto-generated constructor stub

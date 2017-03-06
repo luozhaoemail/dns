@@ -15,6 +15,7 @@ import dns.bean.UserMode;
 
 public class Datetest {
 	public static ConnectionDB db = new ConnectionDB();
+	public static ResultSet rs;
 	
 	public static void close(){
 		db.closeAll();
@@ -51,7 +52,7 @@ public class Datetest {
 	public static ArrayList<UserIp> loadUserIp() throws SQLException {	       
 	    ArrayList<UserIp> list = new ArrayList<UserIp>(); 
 		
-	    ResultSet rs = db.executeQueryRS("select t1.startip,t1.endip,t1.provcode,t1.cominfo,t1.provname,t2.code "
+	    rs = db.executeQueryRS("select t1.startip,t1.endip,t1.provcode,t1.cominfo,t1.provname,t2.code "
 	    		+ " from mfb_ip_locinfo_new t1,mfb_ip_locinfo_cominfo_index t2 "
 	    		+ " where t1.ComInfo=t2.ComInfo ");	  
 	    while(rs.next())
@@ -64,7 +65,7 @@ public class Datetest {
 	    	String Code = rs.getString("Code");	    		    	
 	    	list.add(new UserIp(StartIP,EndIP,ProvCode,ComInfo,ProvName,Code));   	
 		}
-	    rs.close();
+	   // rs.close();
 	    return list;	    
 	}
 	
@@ -75,7 +76,7 @@ public class Datetest {
 	public static ArrayList<ConnInfo> loadConnect() throws SQLException { 
 	    ArrayList<ConnInfo> list = new ArrayList<ConnInfo>(); 
 		
-	    ResultSet rs = db.executeQueryRS("select StartIP,EndIP,ConnectInfo from mfb_ip_connectinfo");	  
+	    rs = db.executeQueryRS("select StartIP,EndIP,ConnectInfo from mfb_ip_connectinfo");	  
 	    while(rs.next())
 		{	    	
 	    	long StartIP = rs.getLong("StartIP");
@@ -83,7 +84,7 @@ public class Datetest {
 	    	int ConnectInfo = rs.getInt("ConnectInfo");  	
 	    	list.add(new ConnInfo(StartIP,EndIP,ConnectInfo));  
 		}
-	    rs.close();
+	    //rs.close();
 	    return list;	    
 	}
 	
@@ -95,7 +96,7 @@ public class Datetest {
 	    
 	    HashMap<String,Domain> hm = new HashMap<String,Domain>(); 
 		
-	    ResultSet rs = db.executeQueryRS("select DmName,Domain,Recode,NetName,Company,ClassifyName,"
+	     rs = db.executeQueryRS("select DmName,Domain,Recode,NetName,Company,ClassifyName,"
 	    		+ "ClassifyParentName from mfb_dmname_info");	  
 	    while(rs.next())
 		{	    	
@@ -108,9 +109,10 @@ public class Datetest {
 	    	String ClassifyParentName=rs.getString("ClassifyParentName");  	
 	    	hm.put(DmName,new Domain(DmName,Domain,Recode,NetName,Company,ClassifyName,ClassifyParentName));   	
 		}
-	    rs.close();
+	    //rs.close();
 	    return hm;	    
 	}
+	
 	/*public static ArrayList<Domain> loadDomain() throws SQLException {	       
 	    ConnectionDB db = new ConnectionDB(); 	   
 	    ArrayList<Domain> list = new ArrayList<Domain>(); 
@@ -139,7 +141,7 @@ public class Datetest {
 	   
 	    ArrayList<UserMode> list = new ArrayList<UserMode>(); 
 		
-	    ResultSet rs = db.executeQueryRS("select StartIP,EndIP,UserInfo from mfb_ip_userinfo order by StartIP asc");	  
+	     rs = db.executeQueryRS("select StartIP,EndIP,UserInfo from mfb_ip_userinfo order by StartIP asc");	  
 	    while(rs.next())
 		{	    	
 	    	long StartIP = rs.getLong("StartIP");
@@ -147,7 +149,7 @@ public class Datetest {
 	    	int UserInfo = rs.getInt("UserInfo");  	
 	    	list.add(new UserMode(StartIP,EndIP,UserInfo));   	
 		}    
-	    rs.close();
+	    //rs.close();
 	    return list;	    
 	}
 	
@@ -158,7 +160,7 @@ public class Datetest {
 	
 	    ArrayList<Helper> list = new ArrayList<Helper>(); 
 		
-	    ResultSet rs = db.executeQueryRS("select StartIP,EndIP,HelperStatue,HelperName,localId "
+	     rs = db.executeQueryRS("select StartIP,EndIP,HelperStatue,HelperName,localId "
 	    		+ " from mfb_localhelper order by StartIP asc");	  
 	    while(rs.next())
 		{	    	
@@ -169,7 +171,7 @@ public class Datetest {
 	    	int localId = rs.getInt("localId"); 
 	    	list.add(new Helper(StartIP,EndIP,HelperStatue,HelperName,localId));   	
 		}
-	    rs.close();
+	    //rs.close();
 	    return list;	    		    
 	}
 }

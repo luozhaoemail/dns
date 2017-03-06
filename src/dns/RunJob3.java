@@ -24,7 +24,7 @@ import dns.bean.Helper;
 import dns.bean.UserIp;
 import dns.bean.UserMode;
 
-public class RunJob2 {
+public class RunJob3 {
 	public static HashMap<String,Domain>dmap;//1 域名集合 dmname_info
 	
 	public static ArrayList<UserIp> ulist;//2 运行商+归属地集合 locinfo_new+locinfo_new_index 连接两张表
@@ -53,114 +53,57 @@ public class RunJob2 {
 			 **/
 			String line = value.toString();
 			String[] s = line.split("\\|");
+			long ip_;
 			
-		if(s[0].matches(reg))
-		{
-			long _ip = IPtoLong.ipToLong(s[0]);//先把ip转化成数字			
-			/*if(s[3].contains(";"))//如果有多个ip1;ip2;1p3 只取第一个		
-				ip_ = IPtoLong.ipToLong(s[3].substring(0,s[3].indexOf(";")));
-			else
-				ip_ = IPtoLong.ipToLong(s[3]);*/
-			
-			//查找域名 1
-			if(dmap.containsKey(s[1]))
+			if(s.length==5 && s[0].matches(reg))
 			{
-				Domain domain = dmap.get(s[1]);		
-				dr.setDmName(domain.getDmName());
-				dr.setDomain(domain.getDomain());
-				dr.setRecode(domain.getRecode());
-				dr.setNetName(domain.getCompany());
-				dr.setCompany(domain.getCompany());
-				dr.setClassifyName(domain.getClassifyName());
-				dr.setClassifyParentName(domain.getClassifyParentName());	
-							
-			//查找用户ip,得到省份和运营商 2						
-			int j =Search.binarySearch(uip1,_ip);//先比较satrtIp		
-			if(j>=0)		
-			{
-				long ip2 = ulist.get(j).getEndIP();//比较endIp			
-				if(_ip<ip2)
+				long _ip = IPtoLong.ipToLong(s[0]);//先把ip转化成数字	
+				
+				if(s[3].length() != 0)
 				{	
-					dr.setProvName(ulist.get(j).getProvName());
-					dr.setCdoe(ulist.get(j).getCode());					
-				}
-			}
-			
-			/**3
-			 * 查找引入方式：1直连引入 2铁通引入 4移动引入 8缓存引入
-			 */			
-			int x =Search.binarySearch(cip1,_ip);//先比较satrtIp		
-			if(x >= 0)	
-			{
-				long ip2 = conlist.get(x).getEndIP();//比较endIp			
-				if(_ip<ip2)
-				{	
-					int i = conlist.get(x).getConnectInfo();
-					switch(i)
-					{				
-						case 1:
-							dr.setDirectConHitCount(1);//自加++							
-							break;
-						case 2:
-							dr.setCTTConHitCount(1);
-							break;
-						case 4:
-							dr.setCMCCConHitCount(1);
-							break;
-						case 8:
-							dr.setCacheConHitCount(1);
-							break;
-						default:break;
+					String[] ips = s[3].split("\\;");						
+					if(ips[0].matches(reg))
+						ip_ = IPtoLong.ipToLong(ips[0]);					
+					
+					/*if(s[3].contains(";"))//如果有多个ip1;ip2;1p3 只取第一个	
+					{
+						String[] ips = s[3].split("\\;");						
+						if(ips[0].matches(reg))
+							ip_ = IPtoLong.ipToLong(ips[0]);
+					}
+					else
+					{	
+						if(s[3].matches(reg))
+							ip_ = IPtoLong.ipToLong(s[3]);						
+					}*/
+				}//end if
+				
+				if(dmap.containsKey(s[1]))//DNS处理
+				{
+					Domain domain = dmap.get(s[1]);		 //1 查找域名
+					dr.setDmName(domain.getDmName());
+					dr.setDomain(domain.getDomain());
+					dr.setRecode(domain.getRecode());
+					dr.setNetName(domain.getNetName());
+					dr.setCompany(domain.getCompany());
+					dr.setClassifyName(domain.getClassifyName());
+					dr.setClassifyParentName(domain.getClassifyParentName());								
+					
+					dr=DealIp.getPro_Com(_ip, ulist, uip1, dr);//2 查找用户ip,得到省份和运营商 
+					dr=DealIp.getConnect(_ip, conlist, cip1, dr);//3 查找引入方式：1直连引入 2铁通引入 4移动引入 8缓存引入 				
+					dr=DealIp.getMode(_ip, modelist, modeip1, dr);//4 查找网络制式 1：4G,2:GPRS,3:WAP,4:固网	
+					dr=DealIp.getHelper(_ip, helplist, heip1, dr);//5 厂商表 1：IDC,2:缓存,3:CDN						
+					
+					try{
+						context.write(new Text(s[1]), dr);							
+					}catch(Exception e){
+						System.out.println(s[0]+"  "+s[1]+"----"+dr);
 					}
 				}
-			}
+								
+			}//end if
 			
-			/**4
-			 * 查找网络制式 1：4G,2:GPRS,3:WAP,4:固网
-			 */
-			int y =Search.binarySearch(modeip1,_ip);//先比较satrtIp		
-			if(y >= 0)	
-			{
-				long ip2 = modelist.get(y).getEndIP();//比较endIp			
-				if(_ip<ip2)
-				{	
-					dr.setUserInfo(modelist.get(y).getUserInfo());
-				}				
-			}
-			
-			/**5
-			 * 厂商表 1：IDC,2:缓存,3:CDN  
-			 */
-			int z =Search.binarySearch(heip1,_ip);//先比较satrtIp		
-			if(z >= 0)	
-			{
-				long ip2 = helplist.get(z).getEndIP();//比较endIp			
-				if(_ip<ip2)
-				{	
-					int i = helplist.get(z).getHelperStatue();
-					switch(i)
-					{				
-						case 1:
-							dr.setIDCCount(1);//自加++
-							break;
-						case 2:
-							dr.setCacheCount(1);;
-							break;
-						case 3:
-							dr.setCDNCount(1);
-							break;					
-						default:break;
-					}
-				}				
-			}		
-
-		//System.out.println(dr);
-		context.write(new Text(s[1]), dr);
-		
-		}//end if
-		}//end if
-		}//end map		
-			
+	}//end map	
 		
 	}
  	
@@ -230,7 +173,7 @@ public class RunJob2 {
 		Configuration conf = new Configuration();		
 		Job job = Job.getInstance(conf,"dns");
 				
-		job.setJarByClass(RunJob2.class);
+		job.setJarByClass(RunJob3.class);
 		job.setMapperClass(Map.class);	
 		job.setReducerClass(Redu.class);
 		
@@ -242,7 +185,7 @@ public class RunJob2 {
         
 		//String[] arg = new String[]{"input/data2.txt","output/dns"};201611140320
 	   //String[] arg = new String[]{"file:///root/hive/data2.txt","file:///root/hive/dns"};
-        String[] arg = new String[]{"file:\\C:\\opt\\data.txt","file:\\C:\\opt\\dns"};
+        String[] arg = new String[]{"file:\\C:\\opt\\201611140320.txt","file:\\C:\\opt\\dns"};
         
         //自动删除output
   		Path path = new Path(arg[1]);

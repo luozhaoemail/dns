@@ -1,11 +1,9 @@
 package dns.bean;
 
 public class UserMode{	
-	private long StartIP;
-	private long EndIP;
-	//private String StrStartIP;
-	//private String StrEndIP;
-	private int UserInfo;
+	private long StartIP=0L;
+	private long EndIP=0L;
+	private int UserInfo=0;
 	
 	public UserMode() {		
 	}
