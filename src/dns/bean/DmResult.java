@@ -34,20 +34,12 @@ public class DmResult implements Writable{
 	private int LocalOperatorCount=0;//本地移动次数
 	private int OtherOperatorCount=0;//外地移动次数
 	
+	private double InNetProportion=0.0;	//网内占百分比
+	private double OutNetProportion=0.0;	//网外占百分比
+	
 	public DmResult() {
 		
 	}
-
-	/*public DmResult(String dmName, String domain, String recode, String netName, String company, String classifyName,
-			String classifyParentName) {
-		DmName = dmName;
-		Domain = domain;
-		Recode = recode;
-		NetName = netName;
-		Company = company;
-		ClassifyName = classifyName;
-		ClassifyParentName = classifyParentName;
-	}*/
 	
 	
 	public String getDmName() {
@@ -132,29 +124,16 @@ public class DmResult implements Writable{
 
 	public int getCTTConHitCount() {
 		return CTTConHitCount;
-	}
-	
-	public void setCMCCConHitCount() {
-		CMCCConHitCount++;
-	}	
+	}		
 	public void setCMCCConHitCount(int cMCCConHitCount) {
 		CMCCConHitCount = cMCCConHitCount;
-	}
-	public void setDirectConHitCount() {
-		DirectConHitCount++;
 	}
 	public void setDirectConHitCount(int directConHitCount) {
 		DirectConHitCount = directConHitCount;
 	}
-	public void setCTTConHitCount() {
-		CTTConHitCount++;
-	}
 	public void setCTTConHitCount(int cTTConHitCount) {
 		CTTConHitCount = cTTConHitCount;
-	}
-	public void setCacheConHitCount() {
-		CacheConHitCount++;
-	}
+	}	
 	public void setCacheConHitCount(int cacheConHitCount) {
 		CacheConHitCount = cacheConHitCount;
 	}
@@ -180,22 +159,13 @@ public class DmResult implements Writable{
 	public int getCDNCount() {
 		return CDNCount;
 	}
-
-	public void setIDCCount() {
-		IDCCount++;
-	}
+	
 	public void setIDCCount(int iDCCount) {
 		IDCCount = iDCCount;
-	}
-	public void setCacheCount() {
-		CacheCount++;
-	}
+	}	
 	public void setCacheCount(int cacheCount) {
 		CacheCount = cacheCount;
-	}
-	public void setCDNCount() {
-		CDNCount++;
-	}
+	}	
 	public void setCDNCount(int cDNCount) {
 		CDNCount = cDNCount;
 	}
@@ -237,28 +207,32 @@ public class DmResult implements Writable{
 		OtherOperatorCount = otherOperatorCount;
 	}
 	//******************************
+	
+	public double getInNetProportion() {
+		return InNetProportion;
+	}
+	public void setInNetProportion(double inNetProportion) {
+		InNetProportion = inNetProportion;
+	}
+	public double getOutNetProportion() {
+		return OutNetProportion;
+	}
+	public void setOutNetProportion(double outNetProportion) {
+		OutNetProportion = outNetProportion;
+	}
+	
 	//------------------------------
 
-	public String toString() {
+/*	public String toString() {
 		return DmName + ", " + Domain + ", " + Recode + ", " + NetName
 				+ ", " + Company + ", " + ClassifyName + ", "
 				+ ClassifyParentName + ", " + ProvName + ", " + Cdoe + ", "
 				+ CacheConHitCount + ", " + CMCCConHitCount + ", " + DirectConHitCount
 				+ ", " + CTTConHitCount + ", " + UserInfo + ", " + IDCCount
 				+ ", " + CacheCount + ", " + CDNCount+"\r\n";
-	}
-
-	/*public String toString() {
-		return "DmResult [DmName=" + DmName + ", Domain=" + Domain + ", Recode=" + Recode + ", NetName=" + NetName
-				+ ", Company=" + Company + ", ClassifyName=" + ClassifyName + ", ClassifyParentName="
-				+ ClassifyParentName + ", ProvName=" + ProvName + ", Cdoe=" + Cdoe + ", CacheConHitCount="
-				+ CacheConHitCount + ", CMCCConHitCount=" + CMCCConHitCount + ", DirectConHitCount=" + DirectConHitCount
-				+ ", CTTConHitCount=" + CTTConHitCount + ", UserInfo=" + UserInfo + ", IDCCount=" + IDCCount
-				+ ", CacheCount=" + CacheCount + ", CDNCount=" + CDNCount + "]";
 	}*/
-		
 	
-
+	
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		DmName = in.readUTF();
@@ -289,6 +263,26 @@ public class DmResult implements Writable{
 		LocalOperatorCount =in.readInt();
 		OtherOperatorCount =in.readInt();
 	}
+
+	@Override
+	public String toString() {
+		return "DmName=" + DmName + ", Domain=" + Domain
+				+ ", Recode=" + Recode + ", NetName=" + NetName + ", Company="
+				+ Company + ", ClassifyName=" + ClassifyName
+				+ ", ClassifyParentName=" + ClassifyParentName + ", ProvName="
+				+ ProvName + ", Cdoe=" + Cdoe + ", CacheConHitCount="
+				+ CacheConHitCount + ", CMCCConHitCount=" + CMCCConHitCount
+				+ ", DirectConHitCount=" + DirectConHitCount
+				+ ", CTTConHitCount=" + CTTConHitCount + ", UserInfo="
+				+ UserInfo + ", IDCCount=" + IDCCount + ", CacheCount="
+				+ CacheCount + ", CDNCount=" + CDNCount + ", CuccCount="
+				+ CuccCount + ", CTCount=" + CTCount + ", GATCount=" + GATCount
+				+ ", ForeignCount=" + ForeignCount + ", LocalOperatorCount="
+				+ LocalOperatorCount + ", OtherOperatorCount="
+				+ OtherOperatorCount + ", InNetProportion=" + InNetProportion
+				+ ", OutNetProportion=" + OutNetProportion + "\n";
+	}
+
 
 	@Override
 	public void write(DataOutput out) throws IOException {

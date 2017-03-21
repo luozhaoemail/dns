@@ -38,14 +38,14 @@ public class RunJob3 {
  	
  	public static ArrayList<Helper> helplist;//5  mfb_localhelper 厂商表 1：IDC,2:缓存,3:CDN
  	public static ArrayList<Long> heip1= new ArrayList<Long>();//Startip集合 	
- 
+ 	public static String reg ="(?:(?:[01]?\\d{1,2}|2[0-4]\\d|25[0-5])\\.){3}(?:[01]?\\d{1,2}|2[0-4]\\d|25[0-5])\\b";
   	
  	public static class Map extends Mapper<LongWritable,Text,Text,DmResult>{ 		
  		
 	 	@Override 
 	 	public void map(LongWritable key,Text value,Context context) 
 					throws IOException, InterruptedException {
-	 		String reg ="(?:(?:[01]?\\d{1,2}|2[0-4]\\d|25[0-5])\\.){3}(?:[01]?\\d{1,2}|2[0-4]\\d|25[0-5])\\b";
+	 		
 	 		DmResult dr = new DmResult();
 	 		
 	 		/**数据格式：源Ip|域名|时间|目的IP|保留字段
@@ -53,7 +53,7 @@ public class RunJob3 {
 			 **/
 			String line = value.toString();
 			String[] s = line.split("\\|");
-			long ip_;
+			long ip_=0L;
 			
 			if(s.length==5 && s[0].matches(reg))
 			{
@@ -61,22 +61,10 @@ public class RunJob3 {
 				
 				if(s[3].length() != 0)
 				{	
-					String[] ips = s[3].split("\\;");						
+					String[] ips = s[3].split("\\;");//按照;拆分，如果有多个ip1;ip2;1p3 只取第一个	，如果没有;就不拆分				
 					if(ips[0].matches(reg))
 						ip_ = IPtoLong.ipToLong(ips[0]);					
-					
-					/*if(s[3].contains(";"))//如果有多个ip1;ip2;1p3 只取第一个	
-					{
-						String[] ips = s[3].split("\\;");						
-						if(ips[0].matches(reg))
-							ip_ = IPtoLong.ipToLong(ips[0]);
-					}
-					else
-					{	
-						if(s[3].matches(reg))
-							ip_ = IPtoLong.ipToLong(s[3]);						
-					}*/
-				}//end if
+				}
 				
 				if(dmap.containsKey(s[1]))//DNS处理
 				{
@@ -90,6 +78,33 @@ public class RunJob3 {
 					dr.setClassifyParentName(domain.getClassifyParentName());								
 					
 					dr=DealIp.getPro_Com(_ip, ulist, uip1, dr);//2 查找用户ip,得到省份和运营商 
+					if(ip_!=0)//目的IP不为空，说明用户访问成功
+					{
+						DmResult dr2 =DealIp.getPro_Com(ip_, ulist, uip1, dr);
+						if(dr.getCdoe()==dr2.getCdoe())//网内连接： 同一运营商
+							dr.setInNetProportion(1);	
+						else						
+							dr.setOutNetProportion(1);//网外连接						
+						
+						if(dr.getCdoe().equals("移动"))
+						{									
+							if(dr.getProvName()==dr2.getProvName())
+								dr.setLocalOperatorCount(1);//同省移动命中一次								
+							else
+								dr.setOtherOperatorCount(1);//外省移动命中一次						
+						}						
+						else if(dr.getCdoe().equals("联通"))
+							dr.setCuccCount(1);						
+						else if(dr.getCdoe().equals("电信"))
+							dr.setCTCount(1);						
+						else if(dr.getProvName().equals("香港"))
+							dr.setGATCount(1);						
+					}
+					else//第三个字段	目的IP为空，说明用户访问不成功	
+					{
+							//统计不成功的次数/总记录=失败率 ，命中率=1-失败率			
+					}				
+					
 					dr=DealIp.getConnect(_ip, conlist, cip1, dr);//3 查找引入方式：1直连引入 2铁通引入 4移动引入 8缓存引入 				
 					dr=DealIp.getMode(_ip, modelist, modeip1, dr);//4 查找网络制式 1：4G,2:GPRS,3:WAP,4:固网	
 					dr=DealIp.getHelper(_ip, helplist, heip1, dr);//5 厂商表 1：IDC,2:缓存,3:CDN						
@@ -97,10 +112,10 @@ public class RunJob3 {
 					try{
 						context.write(new Text(s[1]), dr);							
 					}catch(Exception e){
-						System.out.println(s[0]+"  "+s[1]+"----"+dr);
+						System.out.println(s[0]+"---"+s[1]+"---map error---"+dr);
 					}
 				}
-								
+			System.out.println(dr);				
 			}//end if
 			
 	}//end map	
@@ -119,7 +134,8 @@ public class RunJob3 {
  	    	{
  	    		i++;
  	    		t= iter;    
- 	    	} 	    	
+ 	    	}
+ 	    	
  	    	if(t.getCacheConHitCount()!=0)
  				t.setCacheConHitCount(i);
  			else if(t.getCMCCConHitCount()!=0)
@@ -127,14 +143,39 @@ public class RunJob3 {
  			else if(t.getDirectConHitCount()!=0)
  				t.setDirectConHitCount(i);
  			else if(t.getCTTConHitCount()!=0)
- 				t.setCTTConHitCount(i);	    		
+ 				t.setCTTConHitCount(i);	 
+ 	    	
  			if(t.getCacheCount()!=0)
  				t.setCacheCount(i);
  			else if(t.getCDNCount()!=0)
  				t.setCDNCount(i);
  			else if(t.getIDCCount()!=0)
  				t.setIDCCount(i); 
- 	    	context.write(NullWritable.get(),t);
+ 			 			
+ 			 if(t.getCuccCount()!=0)
+ 				t.setCuccCount(i);
+ 			 else if(t.getCTCount()!=0)
+ 				t.setCTCount(i);
+ 			 else if(t.getGATCount()!=0)
+ 				 t.setGATCount(i); 			
+ 			 else if(t.getLocalOperatorCount()!=0)
+ 				t.setLocalOperatorCount(i);
+ 			 else if(t.getOtherOperatorCount()!=0)
+ 				t.setOtherOperatorCount(i);
+ 			
+ 			 if(t.getInNetProportion()!=0)
+ 				t.setInNetProportion(i);
+ 			 else if(t.getOutNetProportion()!=0)
+ 				t.setOutNetProportion(i);
+ 			 			  //System.out.println(t.getInNetProportion()+"---"+ t.getOutNetProportion());
+ 		
+ 			 			
+ 			try{
+ 				context.write(NullWritable.get(),t);						
+			}catch(Exception e){
+				System.out.println(k+"--reduce error--"+t);
+			}
+ 	    	
 	    } 	    
 	}
 		
@@ -159,13 +200,12 @@ public class RunJob3 {
     		modeip1.add(modelist.get(i).getStartIP());//提取ip1		
 		}
     	helplist = Datetest.loadHelper();//5
-    	Datetest.close();//关闭数据库
     	for(int i= 0;i<helplist.size();i++)
 		{
     		heip1.add(helplist.get(i).getStartIP());//提取ip1		
 		}
     	long t2=System.currentTimeMillis();
-    	System.out.println("加载数据库完毕！！！！用时："+(t2-t1));
+    	System.out.println("加载数据库完毕！！！！用时："+(t2-t1)+"毫秒");
 		
     	/**
     	 * 配置job参数
@@ -185,7 +225,7 @@ public class RunJob3 {
         
 		//String[] arg = new String[]{"input/data2.txt","output/dns"};201611140320
 	   //String[] arg = new String[]{"file:///root/hive/data2.txt","file:///root/hive/dns"};
-        String[] arg = new String[]{"file:\\C:\\opt\\201611140320.txt","file:\\C:\\opt\\dns"};
+        String[] arg = new String[]{"file:\\C:\\opt\\data2.txt","file:\\C:\\opt\\dns"};
         
         //自动删除output
   		Path path = new Path(arg[1]);

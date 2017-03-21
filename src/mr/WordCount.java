@@ -93,7 +93,8 @@ public class WordCount {
 
         //job.setNumReduceTasks(1);//设置reduce任务的个数，默认是一个
      
-        String[] arg = new String[]{"hdfs://node1:9000/input/1.txt","hdfs://node1:9000/output/qq"};
+        //String[] arg = new String[]{"hdfs://mycluster:8020/input/1.txt","hdfs://mycluster:8020/output/qq"};
+        String[] arg = new String[]{"file:\\C:\\opt\\1.txt","file:\\C:\\opt\\1"};
         
         //自动删除output
   		Path path = new Path(arg[1]);

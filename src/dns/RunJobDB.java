@@ -13,14 +13,17 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
+import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+import dns.bean.TbWritable;
 import dns.bean.UserIp;
 
 
 
-public class RunJob {
+public class RunJobDB {
 	public static ArrayList<UserIp> list;
  	public static ArrayList<Long> al= new ArrayList<Long>();  	
  	
@@ -49,7 +52,7 @@ public class RunJob {
 						prov = list.get(index).getProvName();
 						code = list.get(index).getCode();
 						//System.out.println(ss[0]+": "+str);
-						context.write(new LongWritable(ip), new Text(ss[0]+" "+prov+" "+code));
+						context.write(new LongWritable(ip), new Text(ss[0]+";"+prov+";"+code));
 					}
 				}	
 			}//end if			
@@ -57,22 +60,19 @@ public class RunJob {
 			
 		
 	}
- 	
- 	/**
- 	 * ip去重思路：因为同一个ip（用户）会多次上网，只提取ip就会有重复。那么将ip转化为long值
- 	 * 在shuffle阶段使用默认的分区、排序、分组就能将将同一个ip的value发送到对应的reduce
- 	 * reduce得到一个ip的集合，里面是分组后的value集合，而且全是重复的值
- 	 * 那么遍历迭代器时只需要输出一次就break出循环。这样每个reduce只取一个值，
- 	 * 多个reduce就构成了不重复的输出
- 	 */
- 	public static class Red extends Reducer<LongWritable,Text,NullWritable,Text>{
+ 	 	
+ 	public static class Red extends Reducer<LongWritable,Text,TbWritable,TbWritable>{
 		 
 		public void reduce(LongWritable k, Iterable<Text> val, Context context)  
 	            	   throws IOException, InterruptedException {
 	   
 	    	for(Text t : val)
-	    	{
-	    		context.write(NullWritable.get(),t);
+	    	{	    		 
+	    		 String[] str = t.toString().split(";");
+	    		 String ip=str[0];
+	    		 String prov=str[1];
+	    		 String com=str[2];	
+	    		 context.write(new TbWritable(ip,prov,com),null);
 	    		break;
 	    	}
 	    } 	    
@@ -87,31 +87,24 @@ public class RunJob {
 			al.add(list.get(i).getStartIP());//提取ip1		
 		}
 		
-		Configuration conf = new Configuration();		
+		Configuration conf = new Configuration();	
+		DBConfiguration.configureDB(conf,"com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/test","root", "root");
 		Job job = Job.getInstance(conf,"dns");
 				
-		job.setJarByClass(RunJob.class);
+		job.setJarByClass(RunJobDB.class);
 		job.setMapperClass(Map.class);	
 		job.setReducerClass(Red.class);
 		
 		job.setMapOutputKeyClass(LongWritable.class);
 		job.setMapOutputValueClass(Text.class);	
-		job.setOutputKeyClass(NullWritable.class);  
-        job.setOutputValueClass(Text.class);		
-		
-		//相对路径
-        //String[] arg = new String[]{"input/201611140320.txt","output/dns"};
-	    //String[] arg = new String[]{"file:///root/hive/201611140320.txt","file:///root/hive/dns"};
-        String[] arg = new String[]{"file:\\C:\\opt\\data.txt","file:\\C:\\opt\\dns"};
+		job.setOutputKeyClass(TbWritable.class);  
+        job.setOutputValueClass(TbWritable.class);		
         
-        //自动删除output
-  		Path path = new Path(arg[1]);
-  		FileSystem fs = path.getFileSystem(conf);
-  		if(fs.exists(path))
-  			fs.delete(path,true);
-  		
-        FileInputFormat.addInputPath(job, new Path(arg[0]));  //为job设置输入路径
-		FileOutputFormat.setOutputPath(job,new Path(arg[1])); //为job设置输出路径
+        job.setOutputFormatClass(DBOutputFormat.class);  // 输出格式
+        
+        FileInputFormat.addInputPath(job, new Path("file:\\C:\\opt\\data2.txt"));
+		DBOutputFormat.setOutput(job, "tbout2", "ip", "prov", "com");// 输出到表+字段
+        
 		System.exit(job.waitForCompletion(true)?0:1);	  //运行job
 	}
 }
